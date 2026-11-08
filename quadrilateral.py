@@ -19,7 +19,7 @@ from pathlib import Path
 import pandas as pd
 
 # 1. Load CSV (either local questions.csv or Google Sheet export link)
-csv_path = Path(__file__).parent / "questions.csv"
+csv_path = "https://docs.google.com/spreadsheets/d/1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds/gviz/tq?tqx=out:csv&sheet=Quadrilateral"
 # OR live link:
 # csv_path = "https://docs.google.com/spreadsheets/d/1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds/gviz/tq?tqx=out:csv&sheet=Quadrilateral"
 

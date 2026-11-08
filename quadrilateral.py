@@ -82,7 +82,7 @@ QUESTION_BANK = [
         ),
     },
     {
-        "title": "The Perimeter vs. Area Trap",
+        "title": "Perimeter vs. Area",
         "question": (
             "A flexible wire square frame with side length 10 cm has an area"
             " of 100 cm². You push a corner sideways so it squishes into a"
@@ -189,7 +189,7 @@ QUESTION_BANK = [
         ),
     },
     {
-        "title": "The 'Equal Diagonals' Trap",
+        "title": "The 'Equal Diagonals'",
         "question": (
             "A student says: 'If any quadrilateral has diagonals of equal"
             " length, it MUST be a rectangle.' Is this statement correct?"
@@ -232,7 +232,7 @@ QUESTION_BANK = [
         ),
     },
     {
-        "title": "Orientation Bias Trap",
+        "title": "Orientation Bias",
         "question": (
             "A square is rotated 45° so it balances on one corner. A classmate"
             " says: 'It is no longer a square; it is now a diamond.' Are they"
@@ -258,7 +258,7 @@ QUESTION_BANK = [
         ),
     },
     {
-        "title": "The 'One Pair Parallel, One Pair Equal' Trap",
+        "title": "'One Pair Parallel, One Pair Equal'",
         "question": (
             "A quadrilateral has side AB parallel to side CD, and side AD equal"
             " in length to side BC (AD = BC). Must this quadrilateral be a"
@@ -718,7 +718,7 @@ else:
   st.title("🎮 Quadrilateral Challenge")
   st.write(
       "Test your geometry skills! 10 multiple-choice questions on shape"
-      " properties, transformations, and tricky traps."
+      " properties, transformations, and geometrical relationships."
   )
 
   # Initialize Game Session State

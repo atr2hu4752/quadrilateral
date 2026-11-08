@@ -15,313 +15,43 @@ st.set_page_config(
 # ==============================================================================
 # QUESTION BANK FOR GAME MODE
 # ==============================================================================
-QUESTION_BANK = [
-    {
-        "title": "Multi-Shape Classification",
-        "question": (
-            "A quadrilateral has 4 equal side lengths (6 cm each) and all 4"
-            " interior angles are 90°. Which of the following shape categories"
-            " does it belong to?"
-        ),
-        "options": [
-            "Square only",
-            "Rectangle only",
-            "Rhombus only",
-            "Square, Rectangle, Rhombus, and Parallelogram simultaneously",
-        ],
-        "correct": (
-            "Square, Rectangle, Rhombus, and Parallelogram simultaneously"
-        ),
-        "explanation": (
-            "In hierarchical classification, a square satisfies the definition"
-            " of a rectangle (4 right angles), a rhombus (4 equal sides), and a"
-            " parallelogram (2 pairs of parallel sides). It belongs to all of"
-            " them simultaneously!"
-        ),
-    },
-    {
-        "title": "Deformation: Rhombus to Square",
-        "question": (
-            "You have a slanted (non-square) rhombus with sides of 5 cm and an"
-            " acute interior angle of 60°. What single tweak will turn it into"
-            " a square?"
-        ),
-        "options": [
-            "Extend two opposite sides from 5 cm to 8 cm",
-            "Widen the 60° acute angle to 90°",
-            "Pull vertex C outwards along the diagonal",
-            "Shorten the diagonal connecting the acute angles",
-        ],
-        "correct": "Widen the 60° acute angle to 90°",
-        "explanation": (
-            "A rhombus already has 4 equal sides. A square is simply an"
-            " equiangular rhombus. Setting any angle to 90° forces all four"
-            " angles to become 90°, creating a square."
-        ),
-    },
-    {
-        "title": "Deformation: Rectangle to Square",
-        "question": (
-            "You have a rectangle with side AB = 8 cm and side AD = 4 cm (all"
-            " angles 90°). What tweak transforms it into a square?"
-        ),
-        "options": [
-            "Rotate the rectangle clockwise by 45°",
-            "Shorten the longer sides AB and CD from 8 cm to 4 cm",
-            "Change angle A from 90° to 60°",
-            (
-                "Pull vertex C along the diagonal so the diagonals become"
-                " perpendicular"
-            ),
-        ],
-        "correct": "Shorten the longer sides AB and CD from 8 cm to 4 cm",
-        "explanation": (
-            "A rectangle already has four 90° angles. To make it a square, its"
-            " adjacent sides must become equal in length (all 4 sides = 4 cm)."
-            " Rotating it 45° only changes its orientation on the page!"
-        ),
-    },
-    {
-        "title": "Perimeter vs. Area",
-        "question": (
-            "A flexible wire square frame with side length 10 cm has an area"
-            " of 100 cm². You push a corner sideways so it squishes into a"
-            " rhombus with an acute angle of 30°. What happens to its"
-            " perimeter and area?"
-        ),
-        "options": [
-            "Perimeter decreases; area remains 100 cm²",
-            "Perimeter remains 40 cm; area remains 100 cm²",
-            "Perimeter remains 40 cm; area decreases to 50 cm²",
-            "Both perimeter and area decrease",
-        ],
-        "correct": "Perimeter remains 40 cm; area decreases to 50 cm²",
-        "explanation": (
-            "The 4 wire rods do not change length, so Perimeter = 4 × 10 = 40"
-            " cm. But the perpendicular height drops to h = 10 × sin(30°) = 5"
-            " cm. The new Area = base × height = 10 × 5 = 50 cm² (cut in"
-            " half)!"
-        ),
-    },
-    {
-        "title": "Parallelogram to Rhombus",
-        "question": (
-            "You have a parallelogram with AB = 7 cm, AD = 4 cm, and angle A ="
-            " 70°. What single tweak will transform it into a rhombus?"
-        ),
-        "options": [
-            "Change angle A from 70° to 90°",
-            "Extend side AD from 4 cm to 7 cm so all 4 sides are equal",
-            "Make diagonals AC and BD equal in length",
-            "Pull vertex C so opposite sides are no longer parallel",
-        ],
-        "correct": "Extend side AD from 4 cm to 7 cm so all 4 sides are equal",
-        "explanation": (
-            "A rhombus is an equilateral parallelogram. Making side AD = 7 cm"
-            " ensures all 4 sides are equal while keeping opposite sides"
-            " parallel."
-        ),
-    },
-    {
-        "title": "Mystery Shape from Diagonals",
-        "question": (
-            "A quadrilateral has diagonals that bisect each other at right"
-            " angles (90°), but the two diagonals have DIFFERENT lengths (d1 ="
-            " 6 cm, d2 = 10 cm). What shape is it?"
-        ),
-        "options": [
-            "Square",
-            "Non-square Rhombus",
-            "Non-square Rectangle",
-            "Trapezium",
-        ],
-        "correct": "Non-square Rhombus",
-        "explanation": (
-            "Diagonals that are perpendicular bisectors of each other guarantee"
-            " 4 equal sides (a rhombus). Since they are unequal in length, it"
-            " is a non-square rhombus."
-        ),
-    },
-    {
-        "title": "Hong Kong Primary Curriculum Definition",
-        "question": (
-            "Under the official Hong Kong EDB Primary Mathematics curriculum,"
-            " is a rectangle considered a kind of trapezium?"
-        ),
-        "options": [
-            "Yes, because it has at least one pair of parallel sides",
-            "Yes, because all parallelograms are trapeziums",
-            (
-                "No, because the HK curriculum defines a trapezium as having"
-                " ONLY ONE pair of parallel sides"
-            ),
-            "No, because a trapezium cannot have right angles",
-        ],
-        "correct": (
-            "No, because the HK curriculum defines a trapezium as having ONLY"
-            " ONE pair of parallel sides"
-        ),
-        "explanation": (
-            "In Hong Kong primary textbooks and TSA assessments, trapeziums are"
-            " defined exclusively: 'only one pair of opposite sides are"
-            " parallel' (只有一組對邊平行). Since rectangles have two pairs of parallel"
-            " sides, they are not trapeziums in HK schools."
-        ),
-    },
-    {
-        "title": "Deformation: Rhombus to Kite",
-        "question": (
-            "You have a rhombus ABCD with sides of 5 cm. If you keep vertices"
-            " A, B, and D fixed, but pull vertex C outward along diagonal AC so"
-            " that BC = CD = 9 cm, what shape is formed?"
-        ),
-        "options": [
-            "Parallelogram",
-            "Trapezium",
-            "Convex Kite",
-            "Rectangle",
-        ],
-        "correct": "Convex Kite",
-        "explanation": (
-            "Opposite sides are no longer parallel, but adjacent sides are"
-            " equal in two distinct pairs: AB = AD = 5 cm and BC = CD = 9 cm."
-            " This is the definition of a kite!"
-        ),
-    },
-    {
-        "title": "The 'Equal Diagonals'",
-        "question": (
-            "A student says: 'If any quadrilateral has diagonals of equal"
-            " length, it MUST be a rectangle.' Is this statement correct?"
-        ),
-        "options": [
-            "Correct, only rectangles have equal diagonals",
-            (
-                "Incorrect, because an isosceles trapezium also has equal"
-                " diagonals"
-            ),
-            "Incorrect, because squares do not have equal diagonals",
-            "Correct, because equal diagonals always create 90° angles",
-        ],
-        "correct": (
-            "Incorrect, because an isosceles trapezium also has equal diagonals"
-        ),
-        "explanation": (
-            "An isosceles trapezium has diagonals of equal length, but its"
-            " angles are not 90° and it is not a rectangle. To guarantee a"
-            " rectangle, the diagonals must be equal AND bisect each other."
-        ),
-    },
-    {
-        "title": "Four Right Angles",
-        "question": (
-            "A quadrilateral has four 90° angles. Which statement is ALWAYS"
-            " true?"
-        ),
-        "options": [
-            "It must be a square",
-            "It must be a rhombus",
-            "It must be a rectangle (which may or may not be a square)",
-            "It cannot be a parallelogram",
-        ],
-        "correct": "It must be a rectangle (which may or may not be a square)",
-        "explanation": (
-            "Four right angles define a rectangle. We do not know if adjacent"
-            " sides are equal: if they are, it's also a square; if not, it's an"
-            " oblong rectangle. But it is always a rectangle."
-        ),
-    },
-    {
-        "title": "Orientation Bias",
-        "question": (
-            "A square is rotated 45° so it balances on one corner. A classmate"
-            " says: 'It is no longer a square; it is now a diamond.' Are they"
-            " correct?"
-        ),
-        "options": [
-            "Yes, rotating by 45° transforms a square into a diamond",
-            (
-                "No, geometric shapes are defined by sides and angles, not"
-                " orientation"
-            ),
-            "Yes, because squares must have horizontal bases",
-            "No, it is now an irregular quadrilateral",
-        ],
-        "correct": (
-            "No, geometric shapes are defined by sides and angles, not"
-            " orientation"
-        ),
-        "explanation": (
-            "A shape's geometric identity depends only on its intrinsic"
-            " properties (equal sides, 90° angles), never on its rotation on"
-            " the page. It remains a square!"
-        ),
-    },
-    {
-        "title": "'One Pair Parallel, One Pair Equal'",
-        "question": (
-            "A quadrilateral has side AB parallel to side CD, and side AD equal"
-            " in length to side BC (AD = BC). Must this quadrilateral be a"
-            " parallelogram?"
-        ),
-        "options": [
-            "Yes, because one pair is parallel and one pair is equal",
-            (
-                "No, it could be an isosceles trapezium where the non-parallel"
-                " legs are equal"
-            ),
-            "Yes, because parallel lines always have equal opposites",
-            "No, it must be a kite",
-        ],
-        "correct": (
-            "No, it could be an isosceles trapezium where the non-parallel"
-            " legs are equal"
-        ),
-        "explanation": (
-            "To guarantee a parallelogram, the SAME pair of sides must be both"
-            " parallel and equal. If one pair is parallel and the other pair is"
-            " equal, the figure could be an isosceles trapezium!"
-        ),
-    },
-    {
-        "title": "Parallelogram to Rectangle",
-        "question": (
-            "You have a parallelogram with sides 6 cm and 9 cm and an angle of"
-            " 40°. What single tweak will turn it into a rectangle?"
-        ),
-        "options": [
-            "Increase the 40° angle to 90°",
-            "Lengthen the 6 cm side to 9 cm",
-            "Make diagonals perpendicular to each other",
-            "Shorten the 9 cm side to 6 cm",
-        ],
-        "correct": "Increase the 40° angle to 90°",
-        "explanation": (
-            "In any parallelogram, making one angle 90° forces all four angles"
-            " to become 90° (since consecutive interior angles sum to 180°),"
-            " producing a rectangle."
-        ),
-    },
-    {
-        "title": "Diagonals of Rectangles",
-        "question": (
-            "Which property is true for ALL rectangles, but NOT true for all"
-            " general parallelograms?"
-        ),
-        "options": [
-            "Opposite sides are parallel",
-            "Opposite angles are equal",
-            "Diagonals bisect each other",
-            "Diagonals are equal in length",
-        ],
-        "correct": "Diagonals are equal in length",
-        "explanation": (
-            "All parallelograms have opposite sides parallel, opposite angles"
-            " equal, and bisecting diagonals. Only rectangles and squares have"
-            " diagonals that are equal in length!"
-        ),
-    },
-]
+from pathlib import Path
+import pandas as pd
+
+# 1. Load CSV (either local questions.csv or Google Sheet export link)
+csv_path = Path(__file__).parent / "questions.csv"
+# OR live link:
+# csv_path = "https://docs.google.com/spreadsheets/d/1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds/gviz/tq?tqx=out:csv&sheet=Quadrilateral"
+
+df = pd.read_csv(csv_path)
+
+QUESTION_BANK = []
+for _, row in df.iterrows():
+  # Raw text from the sheet
+  raw_options = {
+      "a": str(row["option_a"]).strip(),
+      "b": str(row["option_b"]).strip(),
+      "c": str(row["option_c"]).strip(),
+      "d": str(row["option_d"]).strip(),
+  }
+
+  # Automatically prefix each choice with "A. ", "B. ", "C. ", "D. "
+  display_options = [
+      f"{letter.upper()}. {text}" for letter, text in raw_options.items()
+  ]
+
+  # Automatically prefix the correct answer to match
+  correct_key = str(row["correct"]).strip().lower()
+  correct_display = f"{correct_key.upper()}. {raw_options.get(correct_key, '')}"
+
+  QUESTION_BANK.append({
+      "title": str(row["title"]),
+      "question": str(row["question"]),
+      "options": display_options,
+      "correct": correct_display,
+      "explanation": str(row["explanation"]),
+  })
+
 
 # ==============================================================================
 # MODE SELECTOR IN SIDEBAR

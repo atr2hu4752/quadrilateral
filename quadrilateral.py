@@ -13,55 +13,108 @@ st.set_page_config(
 )
 
 # ==============================================================================
-# QUESTION BANK FOR GAME MODE
+# QUESTION BANK LOADER (READS DIRECTLY FROM GOOGLE SHEETS)
 # ==============================================================================
-from pathlib import Path
-import pandas as pd
+GOOGLE_SHEET_ID = "1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds"
+GOOGLE_SHEET_TAB = "Quadrilateral"
+SHEET_CSV_URL = (
+    f"https://docs.google.com/spreadsheets/d/{GOOGLE_SHEET_ID}/gviz/tq"
+    f"?tqx=out:csv&sheet={GOOGLE_SHEET_TAB}"
+)
 
-# 1. Load CSV (either local questions.csv or Google Sheet export link)
-csv_path = "https://docs.google.com/spreadsheets/d/1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds/gviz/tq?tqx=out:csv&sheet=Quadrilateral"
-# OR live link:
-# csv_path = "https://docs.google.com/spreadsheets/d/1OrTQ0UonsxQIWsid-GLcH-X8UcO4_Eu6ivlTUs7-wds/gviz/tq?tqx=out:csv&sheet=Quadrilateral"
 
-df = pd.read_csv(csv_path)
+@st.cache_data(ttl=60)
+def load_question_bank():
+  """Loads questions from Google Sheets (with fallback to local questions.csv).
 
-QUESTION_BANK = []
-for _, row in df.iterrows():
-  # Raw text from the sheet
-  raw_options = {
-      "a": str(row["option_a"]).strip(),
-      "b": str(row["option_b"]).strip(),
-      "c": str(row["option_c"]).strip(),
-      "d": str(row["option_d"]).strip(),
-  }
+  Caches for 60 seconds so slider movements are instant while Sheet edits sync
+  automatically.
+  """
+  try:
+    df = pd.read_csv(SHEET_CSV_URL)
+  except Exception:
+    local_path = Path(__file__).parent / "questions.csv"
+    if local_path.exists():
+      df = pd.read_csv(local_path)
+    else:
+      st.error(
+          "Could not load questions from Google Sheets or local"
+          " questions.csv."
+      )
+      return []
 
-  # Automatically prefix each choice with "A. ", "B. ", "C. ", "D. "
-  display_options = [
-      f"{letter.upper()}. {text}" for letter, text in raw_options.items()
-  ]
+  bank = []
+  for _, row in df.iterrows():
+    if pd.isna(row.get("question")):
+      continue
 
-  # Automatically prefix the correct answer to match
-  correct_key = str(row["correct"]).strip().lower()
-  correct_display = f"{correct_key.upper()}. {raw_options.get(correct_key, '')}"
+    # Extract options cleanly
+    raw_options = {
+        "a": (
+            str(row["option_a"]).strip() if pd.notna(row.get("option_a")) else ""
+        ),
+        "b": (
+            str(row["option_b"]).strip() if pd.notna(row.get("option_b")) else ""
+        ),
+        "c": (
+            str(row["option_c"]).strip() if pd.notna(row.get("option_c")) else ""
+        ),
+        "d": (
+            str(row["option_d"]).strip() if pd.notna(row.get("option_d")) else ""
+        ),
+    }
 
-  QUESTION_BANK.append({
-      "title": str(row["title"]),
-      "question": str(row["question"]),
-      "options": display_options,
-      "correct": correct_display,
-      "explanation": str(row["explanation"]),
-  })
+    # Automatically add 'A. ', 'B. ', 'C. ', 'D. ' prefixes
+    display_options = [f"{k.upper()}. {v}" for k, v in raw_options.items() if v]
+
+    # Map the correct single letter (a, b, c, or d) to the display string
+    correct_key = (
+        str(row["correct"]).strip().lower()
+        if pd.notna(row.get("correct"))
+        else "a"
+    )
+    correct_display = (
+        f"{correct_key.upper()}. {raw_options.get(correct_key, '')}"
+    )
+
+    bank.append({
+        "id": (
+            int(row["id"])
+            if "id" in row and pd.notna(row["id"])
+            else len(bank) + 1
+        ),
+        "title": str(row.get("title", "Question")).strip(),
+        "question": str(row["question"]).strip(),
+        "options": display_options,
+        "correct": correct_display,
+        "explanation": (
+            str(row.get("explanation", "")).strip()
+            if pd.notna(row.get("explanation"))
+            else ""
+        ),
+    })
+
+  return bank
+
+
+# Load all questions
+QUESTION_BANK = load_question_bank()
 
 
 # ==============================================================================
 # MODE SELECTOR IN SIDEBAR
 # ==============================================================================
 st.sidebar.title("Navigation")
+total_questions_count = len(QUESTION_BANK)
 app_mode = st.sidebar.radio(
     "Choose Mode:",
-    ["🔍 Interactive Explorer", "🎮 Challenge Game Mode (10 Qs)"],
+    [
+        "🔍 Interactive Explorer",
+        f"🎮 Challenge Game Mode ({total_questions_count} Qs)",
+    ],
     index=0,
 )
+
 
 # ==============================================================================
 # MODE 1: INTERACTIVE EXPLORER
@@ -442,16 +495,16 @@ if app_mode == "🔍 Interactive Explorer":
   c4.checkbox("Diagonals Equal", value=bool(diagonals_equal), disabled=True)
 
 # ==============================================================================
-# MODE 2: CHALLENGE GAME MODE
+# MODE 2: CHALLENGE GAME MODE (ALL QUESTIONS INCLUDED)
 # ==============================================================================
-else:
+if app_mode.startswith("🎮 Challenge Game Mode"):
   st.title("🎮 Quadrilateral Challenge")
   st.write(
-      "Test your geometry skills! 10 multiple-choice questions on shape"
-      " properties, transformations, and geometrical relationships."
+      f"Test your geometry skills across **all {total_questions_count}"
+      " questions** loaded from your question bank!"
   )
 
-  # Initialize Game Session State
+  # Initialize Session State
   if "game_active" not in st.session_state:
     st.session_state.game_active = False
   if "game_finished" not in st.session_state:
@@ -469,12 +522,13 @@ else:
   if "current_answered" not in st.session_state:
     st.session_state.current_answered = False
 
-  # Function to start or restart game
-  def start_new_game(name):
+  def start_new_game(name, shuffle_order=False):
     st.session_state.player_name = name if name.strip() else "Alice"
-    st.session_state.selected_questions = random.sample(
-        QUESTION_BANK, min(10, len(QUESTION_BANK))
-    )
+    # Take ALL questions from the bank
+    questions = [dict(q) for q in QUESTION_BANK]
+    if shuffle_order:
+      random.shuffle(questions)
+    st.session_state.selected_questions = questions
     st.session_state.q_index = 0
     st.session_state.score = 0
     st.session_state.game_log = []
@@ -482,7 +536,6 @@ else:
     st.session_state.game_finished = False
     st.session_state.current_answered = False
 
-  # Function to generate downloadable CSV log
   def generate_csv_log():
     output = io.StringIO()
     writer = csv.writer(output)
@@ -518,7 +571,7 @@ else:
       ])
     return output.getvalue().encode("utf-8-sig")
 
-  # SCREEN 1: Welcome & Name Input Screen
+  # SCREEN 1: Welcome & Setup
   if not st.session_state.game_active and not st.session_state.game_finished:
     st.markdown("### 🏆 Welcome to the Challenge!")
     name_input = st.text_input(
@@ -526,27 +579,26 @@ else:
         value=st.session_state.player_name,
         placeholder="e.g. Alice",
     )
+    shuffle_choice = st.checkbox("Randomize question order", value=False)
 
     st.info(
-        "**Rules & Structure:**\n"
-        "- 10 questions in this round.\n"
-        "- You will identify shapes, predict transformation tweaks, and tackle"
-        " tricky curriculum edge-cases.\n"
-        "- Immediate explanation provided after each answer.\n"
+        f"**Round Details:**\n"
+        f"- Contains all **{total_questions_count} questions** currently in the Google Sheet.\n"
+        "- Clear explanations provided after each question.\n"
         "- You can end early at any time and download your progress report."
     )
 
     if st.button("🚀 Start Challenge", use_container_width=True, type="primary"):
-      start_new_game(name_input)
+      start_new_game(name_input, shuffle_order=shuffle_choice)
       st.rerun()
 
-  # SCREEN 2: Active Gameplay Screen
+  # SCREEN 2: Active Question View
   elif st.session_state.game_active and not st.session_state.game_finished:
     current_q_idx = st.session_state.q_index
     total_q = len(st.session_state.selected_questions)
     current_q = st.session_state.selected_questions[current_q_idx]
 
-    # Top Navigation Banner
+    # Top Status Bar
     col_top1, col_top2 = st.columns([3, 1])
     col_top1.write(
         f"👤 **Player:** `{st.session_state.player_name}` | 🎯 **Score:**"
@@ -557,12 +609,11 @@ else:
       st.session_state.game_finished = True
       st.rerun()
 
-    st.progress((current_q_idx) / total_q)
+    st.progress(current_q_idx / total_q)
     st.markdown(f"#### Question {current_q_idx + 1} of {total_q}")
     st.markdown(f"### **{current_q['title']}**")
     st.write(current_q["question"])
 
-    # Radio options for multiple choice
     user_choice = st.radio(
         "Select your answer:",
         current_q["options"],
@@ -570,7 +621,6 @@ else:
         disabled=st.session_state.current_answered,
     )
 
-    # Submission & Feedback controls
     if not st.session_state.current_answered:
       if st.button(
           "Submit Answer ✔️", type="primary", use_container_width=True
@@ -579,7 +629,6 @@ else:
         if is_correct:
           st.session_state.score += 1
 
-        # Record to log
         st.session_state.game_log.append({
             "q_num": current_q_idx + 1,
             "title": current_q["title"],
@@ -592,7 +641,6 @@ else:
         st.session_state.current_answered = True
         st.rerun()
     else:
-      # Display Answer Result
       last_entry = st.session_state.game_log[-1]
       if last_entry["is_correct"]:
         st.success("🎉 **Correct! Well done!**")
@@ -601,14 +649,12 @@ else:
             f"❌ **Incorrect.** The correct answer is: **{current_q['correct']}**"
         )
 
-      st.info(f"💡 **Explanation:** {current_q['explanation']}")
+      if current_q["explanation"]:
+        st.info(f"💡 **Explanation:** {current_q['explanation']}")
 
-      # Next Question / View Results Button
       is_last_q = current_q_idx == total_q - 1
       btn_label = (
-          "🏆 See Final Results"
-          if is_last_q
-          else "Next Question ➡️"
+          "🏆 See Final Results" if is_last_q else "Next Question ➡️"
       )
 
       if st.button(btn_label, type="primary", use_container_width=True):
@@ -620,13 +666,13 @@ else:
           st.session_state.current_answered = False
         st.rerun()
 
-  # SCREEN 3: Game Finished / Summary & Download Screen
+  # SCREEN 3: Summary & Log Download
   elif st.session_state.game_finished:
     total_q = len(st.session_state.selected_questions)
     attempted = len(st.session_state.game_log)
     final_score = st.session_state.score
 
-    if attempted == total_q and final_score >= 8:
+    if attempted == total_q and final_score >= int(0.8 * total_q):
       st.balloons()
       st.success(
           f"🌟 Outstanding, {st.session_state.player_name}! You scored"
@@ -639,7 +685,6 @@ else:
           f" {total_q})."
       )
 
-    # Download Log Button
     csv_bytes = generate_csv_log()
     date_str = datetime.now().strftime("%Y%m%d_%H%M")
     st.download_button(
@@ -663,7 +708,8 @@ else:
         st.write(f"**Your Answer:** {item['user_choice']}")
         if not item["is_correct"]:
           st.write(f"**Correct Answer:** {item['correct']}")
-        st.write(f"**Explanation:** {item['explanation']}")
+        if item["explanation"]:
+          st.write(f"**Explanation:** {item['explanation']}")
 
     st.markdown("---")
     if st.button("🔄 Play Again", type="primary", use_container_width=True):
